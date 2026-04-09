@@ -14,6 +14,7 @@ import {
   Area
 } from 'recharts';
 import { Award, Target, Zap, Book, Search, CheckCircle2, Circle, Star } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function Progress() {
   const [user, setUser] = useState<any>(null);
@@ -30,10 +31,10 @@ export default function Progress() {
   const fetchData = async () => {
     try {
       const [statsRes, historyRes] = await Promise.all([
-        fetch('/api/stats', {
+        fetch(`${API_BASE_URL}/api/stats`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }),
-        fetch('/api/assessments/history', {
+        fetch(`${API_BASE_URL}/api/assessments/history`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
       ]);

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, Star, Clock, ExternalLink, Play, BookOpen, Award } from 'lucide-react';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../config';
 
 export default function Resources() {
   const [resources, setResources] = useState<any[]>([]);
@@ -17,7 +18,7 @@ export default function Resources() {
 
   const fetchResources = async () => {
     try {
-      const res = await fetch('/api/resources', {
+      const res = await fetch(`${API_BASE_URL}/api/resources`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();

@@ -7,6 +7,8 @@ import { Mail, Lock, ArrowRight, Github, Chrome, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion } from 'motion/react';
 
+import { API_BASE_URL } from '../config';
+
 export default function Login({ onLogin }: { onLogin: () => void }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -20,7 +22,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
     setIsLoading(true);
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const endpoint = `${API_BASE_URL}${isLogin ? '/api/auth/login' : '/api/auth/register'}`;
       const body = isLogin ? { email, password } : { name, email, password };
       
       const res = await fetch(endpoint, {

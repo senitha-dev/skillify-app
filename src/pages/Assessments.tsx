@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Upload, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 export default function Assessments() {
   const [questions, setQuestions] = useState<any[]>([]);
@@ -19,7 +20,7 @@ export default function Assessments() {
 
   const fetchQuestions = async () => {
     try {
-      const res = await fetch('/api/questions', {
+      const res = await fetch(`${API_BASE_URL}/api/questions`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -37,7 +38,7 @@ export default function Assessments() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch('/api/assessments/submit', {
+      const res = await fetch(`${API_BASE_URL}/api/assessments/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

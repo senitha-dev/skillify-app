@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Sparkles, Target, Zap, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../config';
 
 export default function GapAnalysis() {
   const [selectedCareer, setSelectedCareer] = useState<any>(null);
@@ -21,10 +22,10 @@ export default function GapAnalysis() {
   const fetchData = async () => {
     try {
       const [pathsRes, historyRes] = await Promise.all([
-        fetch('/api/career-paths', {
+        fetch(`${API_BASE_URL}/api/career-paths`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }),
-        fetch('/api/assessments/history', {
+        fetch(`${API_BASE_URL}/api/assessments/history`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
       ]);

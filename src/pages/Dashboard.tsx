@@ -17,6 +17,7 @@ import {
   Database
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 const quickActions = [
   { icon: LayoutGrid, label: 'Take Assessment', desc: 'Evaluate your skills', path: '/assessments', color: 'text-slate-600', bg: 'bg-slate-50' },
@@ -40,7 +41,7 @@ export default function Dashboard() {
 
   const checkInitialization = async () => {
     try {
-      const res = await fetch('/api/questions', {
+      const res = await fetch(`${API_BASE_URL}/api/questions`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
@@ -55,7 +56,7 @@ export default function Dashboard() {
   const handleInitialize = async () => {
     setIsInitializing(true);
     try {
-      const res = await fetch('/api/seed', { method: 'POST' });
+      const res = await fetch(`${API_BASE_URL}/api/seed`, { method: 'POST' });
       if (res.ok) {
         toast.success('System initialized successfully!');
         setNeedsInit(false);

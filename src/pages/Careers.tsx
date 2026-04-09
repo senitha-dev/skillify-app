@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Briefcase, Shield, Code, Database, Cpu, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../config';
 
 const icons: Record<string, any> = {
   'Software Engineer': Code,
@@ -49,7 +50,7 @@ export default function Careers() {
 
   const fetchPaths = async () => {
     try {
-      const res = await fetch('/api/career-paths', {
+      const res = await fetch(`${API_BASE_URL}/api/career-paths`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
