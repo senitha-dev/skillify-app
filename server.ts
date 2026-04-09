@@ -97,6 +97,14 @@ app.get('/api/health', async (req, res) => {
   const dbState = mongoose.connection.readyState;
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
   
+  if (dbState !== 1) {
+    console.log(`[Health Check] DB State: ${states[dbState]}. URI Set: ${!!MONGODB_URI}`);
+    if (MONGODB_URI) {
+      // Attempt to reconnect if disconnected
+      connectDB();
+    }
+  }
+  
   res.json({
     status: 'ok',
     database: states[dbState],
