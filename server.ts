@@ -47,26 +47,38 @@ app.use((req, res, next) => {
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
+let lastDbError: string | null = null;
+
 const connectDB = async () => {
   if (!MONGODB_URI) {
-    console.error('❌ CRITICAL ERROR: MONGODB_URI is not defined in environment variables!');
-    console.error('Please add MONGODB_URI to the Secrets panel (Gear icon -> Secrets).');
+    lastDbError = 'MONGODB_URI is missing. Please add it in the Secrets panel (Settings -> Secrets).';
+    console.error('❌ CRITICAL ERROR:', lastDbError);
     return;
   }
 
+  if (MONGODB_URI.trim() !== MONGODB_URI) {
+    console.warn('⚠️ WARNING: MONGODB_URI has leading or trailing spaces!');
+  }
+
   try {
-    console.log('Attempting to connect to MongoDB...');
+    const maskedUri = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+    console.log(`Attempting to connect to MongoDB with URI: ${maskedUri}`);
+    
     if (mongoose.connection.readyState === 1) {
       console.log('✅ Already connected to MongoDB');
+      lastDbError = null;
       return;
     }
+    
     await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 15000,
       socketTimeoutMS: 45000,
-      family: 4, // Force IPv4
+      family: 4,
     });
     console.log('✅ Successfully connected to MongoDB Atlas');
+    lastDbError = null;
   } catch (err: any) {
+    lastDbError = err.message;
     console.error('❌ MongoDB connection error:', err.message);
     if (err.message.includes('querySrv ENOTFOUND')) {
       console.error('👉 Hint: This usually means the MongoDB URI is incorrect or DNS is blocked.');
@@ -100,17 +112,15 @@ app.get('/api/health', async (req, res) => {
   const info = {
     status: 'ok',
     database: states[dbState],
+    db_error: lastDbError,
     mongodb_uri_set: !!MONGODB_URI,
     mongodb_uri_length: MONGODB_URI ? MONGODB_URI.length : 0,
     env: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()
   };
 
-  if (dbState !== 1) {
-    console.log(`[Health Check] DB State: ${states[dbState]}. URI Set: ${!!MONGODB_URI}`);
-    if (MONGODB_URI) {
-      connectDB();
-    }
+  if (dbState !== 1 && MONGODB_URI) {
+    connectDB();
   }
   
   res.json(info);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { apiFetch } from '../lib/api';
 import { toast } from 'sonner';
 import { 
   ArrowRight, 
@@ -34,6 +35,7 @@ export default function Dashboard() {
   const [isInitializing, setIsInitializing] = useState(false);
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'connecting' | 'unknown'>('unknown');
   const [isUriSet, setIsUriSet] = useState<boolean | null>(null);
+  const [dbError, setDbError] = useState<string | null>(null);
   const [isMobileWithoutApi, setIsMobileWithoutApi] = useState(false);
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export default function Dashboard() {
         const data = await res.json();
         setDbStatus(data.database);
         setIsUriSet(data.mongodb_uri_set);
+        setDbError(data.db_error);
       } else {
         setDbStatus('disconnected');
       }
@@ -74,17 +77,18 @@ export default function Dashboard() {
   };
 
   const checkInitialization = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return; // Don't check if not logged in
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/questions`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await apiFetch('/api/questions');
+      if (!res) return;
       
       if (!res.ok) {
         if (res.status === 403 || res.status === 401) {
-          // Token might be invalid
           return;
         }
-        throw new Error('Failed to fetch questions');
+        return; // Silently fail to avoid toast spam
       }
 
       const data = await res.json();
@@ -92,14 +96,16 @@ export default function Dashboard() {
         setNeedsInit(true);
       }
     } catch (error) {
-      console.error('Failed to check initialization', error);
+      // Silently fail
     }
   };
 
   const handleInitialize = async () => {
     setIsInitializing(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/seed`, { method: 'POST' });
+      const res = await apiFetch('/api/seed', { method: 'POST' });
+      if (!res) return;
+      
       if (res.ok) {
         toast.success('System initialized successfully!');
         setNeedsInit(false);
@@ -142,7 +148,70 @@ export default function Dashboard() {
         <p className="text-slate-500 text-base sm:text-lg">Start your skill assessment to get personalized career guidance.</p>
       </div>
 
-      {isMobileWithoutApi && (
+      {dbStatus !== 'connected' && (
+        <Card className="bg-slate-900 border-slate-800 shadow-2xl rounded-3xl overflow-hidden">
+          <CardContent className="p-0">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">System Diagnostics</span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-500">{new Date().toISOString()}</span>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Connection Status</p>
+                    <p className="text-xl font-mono font-bold text-red-400 uppercase">{dbStatus}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Environment</p>
+                    <p className="text-sm font-mono text-slate-300">{window.location.protocol.startsWith('http') ? 'Web Preview' : 'Mobile App'}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Active API Endpoint</p>
+                    <p className="text-sm font-mono text-blue-400 truncate">{API_BASE_URL || '(relative path)'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Secret Configured</p>
+                    <p className="text-sm font-mono text-slate-300">{isUriSet ? 'YES (MONGODB_URI detected)' : 'NO (Secret missing)'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                <p className="text-[10px] font-mono font-bold text-red-500 uppercase tracking-widest">Last Error Output</p>
+                <div className="font-mono text-xs text-slate-400 leading-relaxed break-all">
+                  {dbError || 'No error message received from server. Check if the server is running.'}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row gap-3">
+                <Button 
+                  className="bg-white hover:bg-slate-200 text-slate-900 font-bold rounded-xl px-6"
+                  onClick={() => window.location.reload()}
+                >
+                  Retry Connection
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="border-slate-700 text-slate-300 hover:bg-slate-800 font-bold rounded-xl px-6"
+                  onClick={() => window.open('https://cloud.mongodb.com', '_blank')}
+                >
+                  Check Atlas Status
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {isMobileWithoutApi && dbStatus === 'connected' && (
         <Card className="bg-orange-50 border-orange-100 shadow-none rounded-3xl overflow-hidden">
           <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -152,31 +221,9 @@ export default function Dashboard() {
               <div>
                 <h4 className="font-bold text-orange-900">Mobile API URL Required</h4>
                 <p className="text-sm text-orange-700">For the mobile app to work, you must set the VITE_API_URL secret in AI Studio to your project's App URL.</p>
+                <p className="text-[10px] mt-1 text-orange-600 font-mono">Current API: {API_BASE_URL || '(relative path - will fail on mobile)'}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {isUriSet === false && (
-        <Card className="bg-red-50 border-red-100 shadow-none rounded-3xl overflow-hidden">
-          <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-red-600">
-                <Settings className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-bold text-red-900">Database Configuration Missing</h4>
-                <p className="text-sm text-red-700">Please add your MongoDB URI to the Secrets panel in AI Studio settings.</p>
-              </div>
-            </div>
-            <Button 
-              variant="outline"
-              className="border-red-200 text-red-600 hover:bg-red-100 font-bold rounded-xl px-6"
-              onClick={() => window.location.reload()}
-            >
-              Retry Connection
-            </Button>
           </CardContent>
         </Card>
       )}

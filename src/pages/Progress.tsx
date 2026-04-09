@@ -14,7 +14,7 @@ import {
   Area
 } from 'recharts';
 import { Award, Target, Zap, Book, Search, CheckCircle2, Circle, Star } from 'lucide-react';
-import { API_BASE_URL } from '../config';
+import { apiFetch } from '../lib/api';
 import { toast } from 'sonner';
 
 export default function Progress() {
@@ -32,13 +32,11 @@ export default function Progress() {
   const fetchData = async () => {
     try {
       const [statsRes, historyRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/stats`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        }),
-        fetch(`${API_BASE_URL}/api/assessments/history`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        })
+        apiFetch('/api/stats'),
+        apiFetch('/api/assessments/history')
       ]);
+
+      if (!statsRes || !historyRes) return;
 
       if (!statsRes.ok || !historyRes.ok) {
         throw new Error('Failed to fetch progress data');

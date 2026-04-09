@@ -28,3 +28,8 @@ export const API_BASE_URL = (() => {
     return '';
   }
 })();
+
+console.log('[Config] API_BASE_URL initialized as:', API_BASE_URL || '(relative)');
+if (!API_BASE_URL && typeof window !== 'undefined' && !window.location.protocol.startsWith('http')) {
+  console.error('[CRITICAL] Mobile environment detected but VITE_API_URL is missing! Backend requests will fail.');
+}

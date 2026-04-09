@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Sparkles, Target, Zap, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../lib/api';
 import { toast } from 'sonner';
-import { API_BASE_URL } from '../config';
 
 export default function GapAnalysis() {
   const [selectedCareer, setSelectedCareer] = useState<any>(null);
@@ -22,13 +22,11 @@ export default function GapAnalysis() {
   const fetchData = async () => {
     try {
       const [pathsRes, historyRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/career-paths`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        }),
-        fetch(`${API_BASE_URL}/api/assessments/history`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        })
+        apiFetch('/api/career-paths'),
+        apiFetch('/api/assessments/history')
       ]);
+
+      if (!pathsRes || !historyRes) return;
 
       if (!pathsRes.ok || !historyRes.ok) {
         throw new Error('Failed to fetch gap analysis data');

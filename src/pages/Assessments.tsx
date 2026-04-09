@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Upload, CheckCircle2 } from 'lucide-react';
+import { apiFetch } from '../lib/api';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config';
 
 export default function Assessments() {
   const [questions, setQuestions] = useState<any[]>([]);
@@ -19,13 +19,24 @@ export default function Assessments() {
   }, []);
 
   const fetchQuestions = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/questions`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await apiFetch('/api/questions');
+      if (!res) return;
+      
+      if (!res.ok) {
+        throw new Error('Failed to load questions');
+      }
+
       const data = await res.json();
       setQuestions(data);
     } catch (error) {
+      console.error('Failed to load questions', error);
       toast.error('Failed to load questions');
     } finally {
       setIsLoading(false);
@@ -38,14 +49,12 @@ export default function Assessments() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/assessments/submit`, {
+      const res = await apiFetch('/api/assessments/submit', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
         body: JSON.stringify({ scores: answers })
       });
+      if (!res) return;
+      
       if (res.ok) {
         toast.success('Assessment submitted successfully!');
         navigate('/progress');

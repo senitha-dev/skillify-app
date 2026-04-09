@@ -5,8 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, ArrowRight, Briefcase, Shield, Code, Database, Cpu, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../lib/api';
 import { toast } from 'sonner';
-import { API_BASE_URL } from '../config';
 
 const icons: Record<string, any> = {
   'Software Engineer': Code,
@@ -50,9 +50,8 @@ export default function Careers() {
 
   const fetchPaths = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/career-paths`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await apiFetch('/api/career-paths');
+      if (!res) return;
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -86,7 +85,14 @@ export default function Careers() {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        {paths.map((path, i) => {
+        {paths.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 space-y-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+            <p className="text-slate-500 font-medium">No career paths available.</p>
+            <Button onClick={() => navigate('/')} variant="outline" className="rounded-xl">
+              Go to Dashboard to Initialize
+            </Button>
+          </div>
+        ) : paths.map((path, i) => {
           const Icon = icons[path.title] || Briefcase;
           return (
             <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all rounded-3xl overflow-hidden group">

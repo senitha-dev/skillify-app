@@ -25,10 +25,15 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
       const endpoint = `${API_BASE_URL}${isLogin ? '/api/auth/login' : '/api/auth/register'}`;
       const body = isLogin ? { email, password } : { name, email, password };
       
+      console.log(`[Auth] Attempting ${isLogin ? 'login' : 'register'} at: ${endpoint}`);
+      
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
+      }).catch(err => {
+        console.error('[Auth] Fetch failed:', err);
+        throw new Error(`Connection failed: ${err.message}. Check your VITE_API_URL.`);
       });
 
       const data = await res.json().catch(() => ({ message: 'Server error' }));

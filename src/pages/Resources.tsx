@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, Star, Clock, ExternalLink, Play, BookOpen, Award } from 'lucide-react';
+import { apiFetch } from '../lib/api';
 import { toast } from 'sonner';
-import { API_BASE_URL } from '../config';
 
 export default function Resources() {
   const [resources, setResources] = useState<any[]>([]);
@@ -18,9 +18,8 @@ export default function Resources() {
 
   const fetchResources = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/resources`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
+      const res = await apiFetch('/api/resources');
+      if (!res) return;
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -85,7 +84,11 @@ export default function Resources() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredResources.map((resource, i) => (
+        {filteredResources.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center h-64 space-y-4 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+            <p className="text-slate-500 font-medium">No learning resources available.</p>
+          </div>
+        ) : filteredResources.map((resource, i) => (
           <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all rounded-3xl overflow-hidden group">
             <CardContent className="p-6 space-y-4">
               <div className="flex justify-between items-start">
