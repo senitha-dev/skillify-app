@@ -35,6 +35,8 @@ export default function Dashboard() {
   const [isInitializing, setIsInitializing] = useState(false);
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'connecting' | 'unknown'>('unknown');
   const [isUriSet, setIsUriSet] = useState<boolean | null>(null);
+  const [isApiUrlSet, setIsApiUrlSet] = useState<boolean | null>(null);
+  const [availableKeys, setAvailableKeys] = useState<string[]>([]);
   const [dbError, setDbError] = useState<string | null>(null);
   const [isMobileWithoutApi, setIsMobileWithoutApi] = useState(false);
 
@@ -67,6 +69,8 @@ export default function Dashboard() {
         const data = await res.json();
         setDbStatus(data.database);
         setIsUriSet(data.mongodb_uri_set);
+        setIsApiUrlSet(data.vite_api_url_set);
+        setAvailableKeys(data.available_keys || []);
         setDbError(data.db_error);
       } else {
         setDbStatus('disconnected');
@@ -179,7 +183,20 @@ export default function Dashboard() {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Secret Configured</p>
-                    <p className="text-sm font-mono text-slate-300">{isUriSet ? 'YES (MONGODB_URI detected)' : 'NO (Secret missing)'}</p>
+                    <p className={`text-sm font-mono ${isUriSet ? 'text-green-400' : 'text-red-400'}`}>
+                      MONGODB_URI: {isUriSet ? 'YES' : 'MISSING'}
+                    </p>
+                    {!isUriSet && (
+                      <p className="text-[9px] text-slate-500 italic mt-1 leading-tight">
+                        Go to Settings &rarr; Secrets and add MONGODB_URI
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1 mt-2">
+                    <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Detected Env Keys</p>
+                    <p className="text-[9px] font-mono text-slate-400">
+                      {availableKeys.length > 0 ? availableKeys.join(', ') : 'None detected'}
+                    </p>
                   </div>
                 </div>
               </div>
