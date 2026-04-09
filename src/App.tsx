@@ -27,12 +27,12 @@ export default function App() {
         <Route path="/login" element={!isAuthenticated ? <Login onLogin={() => setIsAuthenticated(true)} /> : <Navigate to="/" />} />
         
         <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
-          <Route path="/" element={<Dashboard />} />
           <Route path="/assessments" element={<Assessments />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/resources" element={<Resources />} />
           <Route path="/progress" element={<Progress />} />
           <Route path="/gap-analysis" element={<GapAnalysis />} />
+          <Route path="/" element={<Dashboard />} />
         </Route>
       </Routes>
       <Toaster />
