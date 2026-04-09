@@ -131,8 +131,12 @@
     }
   body {
     @apply bg-background text-foreground;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
     }
   html {
     @apply font-sans;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
     }
 }

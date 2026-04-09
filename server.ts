@@ -21,6 +21,29 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 app.use(cors());
 app.use(express.json());
 
+// Request Logging Middleware
+app.use((req, res, next) => {
+  const isApi = req.path.startsWith('/api');
+  if (isApi) {
+    console.log(`[API Request] ${req.method} ${req.path}`);
+  }
+  
+  // Intercept HTML responses for API routes
+  const originalSend = res.send;
+  res.send = function(body) {
+    if (isApi && typeof body === 'string' && body.includes('<!doctype html>')) {
+      console.error(`[CRITICAL] API route ${req.path} attempted to send HTML!`);
+      return res.status(500).json({ 
+        message: 'Internal Server Error: API route returned HTML instead of JSON',
+        path: req.path
+      });
+    }
+    return originalSend.call(this, body);
+  };
+  
+  next();
+});
+
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -69,14 +92,27 @@ const authenticateToken = (req: any, res: any, next: any) => {
 
 // --- API ROUTES ---
 
+// Health Check
+app.get('/api/health', async (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  
+  res.json({
+    status: 'ok',
+    database: states[dbState],
+    mongodb_uri_set: !!MONGODB_URI,
+    env: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Debug DB Connection
 app.get('/api/debug/db', (req, res) => {
   const state = mongoose.connection.readyState;
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
   res.json({
     status: states[state],
-    uri: MONGODB_URI.split('@')[1] ? `mongodb+srv://***@${MONGODB_URI.split('@')[1]}` : 'Invalid URI',
-    isDefault: MONGODB_URI.includes('PASSWORD')
+    uri_info: MONGODB_URI ? `mongodb+srv://***@${MONGODB_URI.split('@')[1] || 'hidden'}` : 'Not Set',
+    is_placeholder: MONGODB_URI?.includes('PASSWORD') || false
   });
 });
 
@@ -343,6 +379,24 @@ app.post('/api/seed', async (req, res) => {
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
+});
+
+// 404 Handler for API routes (must be after all API routes)
+app.all('/api/*', (req, res) => {
+  console.warn(`[API 404] ${req.method} ${req.path}`);
+  res.status(404).json({ message: `API route not found: ${req.path}` });
+});
+
+// Global Error Handler
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('[Global Error]', err);
+  if (req.path.startsWith('/api')) {
+    return res.status(500).json({ 
+      message: 'Internal Server Error', 
+      error: process.env.NODE_ENV === 'production' ? {} : err.message 
+    });
+  }
+  next(err);
 });
 
 // --- VITE MIDDLEWARE ---

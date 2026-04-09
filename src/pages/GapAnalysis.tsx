@@ -30,14 +30,19 @@ export default function GapAnalysis() {
         })
       ]);
 
+      if (!pathsRes.ok || !historyRes.ok) {
+        throw new Error('Failed to fetch gap analysis data');
+      }
+
       const paths = await pathsRes.json();
       const history = await historyRes.json();
 
-      setCareerPaths(paths);
-      if (paths.length > 0) setSelectedCareer(paths[0]);
-      if (history.length > 0) setLatestAssessment(history[0]);
-    } catch (error) {
-      toast.error('Failed to load data');
+      setCareerPaths(Array.isArray(paths) ? paths : []);
+      if (Array.isArray(paths) && paths.length > 0) setSelectedCareer(paths[0]);
+      if (Array.isArray(history) && history.length > 0) setLatestAssessment(history[0]);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to load data');
+      console.error('Gap analysis fetch error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -91,8 +96,8 @@ export default function GapAnalysis() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Skill Gap Identification</h1>
-        <p className="text-slate-500 text-lg">Compare your skills against your target career requirements</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Skill Gap Identification</h1>
+        <p className="text-slate-500 text-base sm:text-lg">Compare your skills against your target career requirements</p>
       </div>
 
       <div className="space-y-4">
@@ -133,9 +138,9 @@ export default function GapAnalysis() {
       </div>
 
       <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[32px] overflow-hidden">
-        <CardContent className="p-8 space-y-10">
+        <CardContent className="p-6 md:p-8 space-y-8 md:space-y-10">
           <div className="flex items-center gap-3">
-            <h3 className="text-2xl font-bold text-slate-900">Skill Gap: <span className="text-blue-600">{selectedCareer?.title}</span></h3>
+            <h3 className="text-xl md:text-2xl font-bold text-slate-900 leading-tight">Skill Gap: <span className="text-blue-600">{selectedCareer?.title}</span></h3>
           </div>
 
           <div className="space-y-8">

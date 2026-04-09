@@ -181,13 +181,13 @@ export default function Layout() {
       </main>
 
       {/* Mobile Nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-200 px-4 pt-2 pb-safe flex justify-around items-center z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 px-2 pt-2 pb-safe flex justify-around items-center z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         {bottomNavItems.map((item) => (
-          <Link key={item.path} to={item.path} className="flex flex-col items-center gap-1 flex-1 py-1">
-            <div className={`p-2 rounded-2xl transition-all ${location.pathname === item.path ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 scale-110' : 'text-slate-400'}`}>
+          <Link key={item.path} to={item.path} className="flex flex-col items-center gap-1 flex-1 py-1 active:scale-90 transition-transform">
+            <div className={`p-2.5 rounded-2xl transition-all duration-300 ${location.pathname === item.path ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 scale-110' : 'text-slate-400 hover:text-slate-600'}`}>
               <item.icon className="w-5 h-5" />
             </div>
-            <span className={`text-[9px] font-bold uppercase tracking-tighter ${location.pathname === item.path ? 'text-blue-600' : 'text-slate-400'}`}>
+            <span className={`text-[8px] font-bold uppercase tracking-widest ${location.pathname === item.path ? 'text-blue-600' : 'text-slate-400'}`}>
               {item.label}
             </span>
           </Link>

@@ -131,7 +131,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
 
               <Button 
                 type="submit"
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white font-semibold shadow-lg shadow-blue-200 transition-all active:scale-[0.98]"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white font-semibold shadow-lg shadow-blue-200 transition-all active:scale-[0.98] active:opacity-90"
                 disabled={isLoading}
               >
                 {isLoading ? 'Processing...' : (

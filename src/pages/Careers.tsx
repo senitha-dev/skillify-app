@@ -53,10 +53,17 @@ export default function Careers() {
       const res = await fetch(`${API_BASE_URL}/api/career-paths`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server error: ${res.status}`);
+      }
+
       const data = await res.json();
-      setPaths(data);
-    } catch (error) {
-      toast.error('Failed to load career paths');
+      setPaths(Array.isArray(data) ? data : []);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to load career paths');
+      console.error('Careers fetch error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -74,8 +81,8 @@ export default function Careers() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight">IT Career Paths</h1>
-        <p className="text-slate-500 text-lg">Explore career paths and their skill requirements</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">IT Career Paths</h1>
+        <p className="text-slate-500 text-base sm:text-lg">Explore career paths and their skill requirements</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
@@ -83,19 +90,19 @@ export default function Careers() {
           const Icon = icons[path.title] || Briefcase;
           return (
             <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all rounded-3xl overflow-hidden group">
-              <CardContent className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="flex items-start gap-6 flex-1">
-                  <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-                    <Icon className="w-8 h-8" />
+              <CardContent className="p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 flex-1 w-full">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
+                    <Icon className="w-7 h-7 sm:w-8 sm:h-8" />
                   </div>
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-2xl font-bold text-slate-900">{path.title}</h3>
-                      <Badge variant="secondary" className="bg-green-50 text-green-600 border-none font-bold text-[10px] uppercase tracking-widest">
+                  <div className="space-y-2 flex-1 w-full">
+                    <div className="flex items-center justify-between sm:justify-start gap-3">
+                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900">{path.title}</h3>
+                      <Badge variant="secondary" className="bg-green-50 text-green-600 border-none font-bold text-[9px] sm:text-[10px] uppercase tracking-widest">
                         Very High
                       </Badge>
                     </div>
-                    <p className="text-slate-500 max-w-xl">{path.description}</p>
+                    <p className="text-sm sm:text-base text-slate-500 max-w-xl line-clamp-2 sm:line-clamp-none">{path.description}</p>
                     <div className="flex items-center gap-6 pt-2">
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Salary Range</p>

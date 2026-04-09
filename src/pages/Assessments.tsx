@@ -83,8 +83,8 @@ export default function Assessments() {
       </div>
 
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Skill Assessment</h1>
-        <p className="text-slate-500 text-lg">Rate your proficiency in each skill area</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Skill Assessment</h1>
+        <p className="text-slate-500 text-base sm:text-lg">Rate your proficiency in each skill area</p>
       </div>
 
       <Button variant="outline" className="w-full h-14 rounded-2xl border-blue-100 text-blue-600 font-bold gap-3 hover:bg-blue-50">
@@ -101,26 +101,26 @@ export default function Assessments() {
       </div>
 
       <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[24px] md:rounded-[32px] overflow-hidden">
-        <CardHeader className="p-5 md:p-8 pb-2 md:pb-4">
-          <CardTitle className="text-2xl md:text-3xl font-bold text-slate-900">{questions[currentStep]?.category}</CardTitle>
-          <CardDescription className="text-sm md:text-lg text-slate-500">Rate your proficiency level for each skill.</CardDescription>
+        <CardHeader className="p-6 md:p-8 pb-3 md:pb-4">
+          <CardTitle className="text-xl md:text-3xl font-bold text-slate-900">{questions[currentStep]?.category}</CardTitle>
+          <CardDescription className="text-xs md:text-lg text-slate-500">Rate your proficiency level for each skill.</CardDescription>
         </CardHeader>
-        <CardContent className="p-5 md:p-8 pt-2 md:pt-4 space-y-6 md:space-y-10">
+        <CardContent className="p-6 md:p-8 pt-3 md:pt-4 space-y-6 md:space-y-10">
           <div className="space-y-4 md:space-y-6">
-            <div className="flex justify-between items-center">
-              <h4 className="font-bold text-slate-900 text-base md:text-lg">{questions[currentStep]?.text}</h4>
-              <span className="text-blue-600 font-bold text-xs md:text-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <h4 className="font-bold text-slate-900 text-base md:text-lg leading-tight">{questions[currentStep]?.text}</h4>
+              <span className="text-blue-600 font-bold text-xs md:text-sm bg-blue-50 px-3 py-1 rounded-full w-fit">
                 {answers[questions[currentStep]?.category] !== undefined ? 
                   ['None', 'Beg.', 'Inter.', 'Adv.', 'Expert'][answers[questions[currentStep]?.category]] : 
                   'None'}
               </span>
             </div>
-            <div className="grid grid-cols-5 gap-1 md:gap-2 p-1 bg-slate-50 rounded-xl md:rounded-2xl border border-slate-100">
+            <div className="grid grid-cols-5 gap-1 p-1 bg-slate-50 rounded-xl md:rounded-2xl border border-slate-100">
               {['None', 'Beg.', 'Inter.', 'Adv.', 'Expert'].map((label, i) => (
                 <button
                   key={i}
                   onClick={() => handleAnswer(questions[currentStep]?.category, i)}
-                  className={`py-2.5 md:py-3 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold transition-all ${
+                  className={`py-3 md:py-4 rounded-lg md:rounded-xl text-[9px] sm:text-[10px] md:text-xs font-bold transition-all ${
                     answers[questions[currentStep]?.category] === i 
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
                     : 'text-slate-500 hover:bg-white hover:text-slate-900'

@@ -21,10 +21,17 @@ export default function Resources() {
       const res = await fetch(`${API_BASE_URL}/api/resources`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server error: ${res.status}`);
+      }
+
       const data = await res.json();
-      setResources(data);
-    } catch (error) {
-      toast.error('Failed to load resources');
+      setResources(Array.isArray(data) ? data : []);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to load resources');
+      console.error('Resources fetch error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -37,8 +44,8 @@ export default function Resources() {
   return (
     <div className="space-y-8 pb-20 md:pb-0">
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Learning Resources</h1>
-        <p className="text-slate-500 text-lg">Curated courses and materials to bridge your skill gaps</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Learning Resources</h1>
+        <p className="text-slate-500 text-base sm:text-lg">Curated courses and materials to bridge your skill gaps</p>
       </div>
 
       <Card className="bg-blue-50 border-none shadow-none rounded-3xl overflow-hidden">
@@ -60,12 +67,12 @@ export default function Resources() {
       </Card>
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
+        <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto scrollbar-hide">
           {['All', 'Course', 'Certificate', 'Video'].map((t) => (
             <button
               key={t}
               onClick={() => setFilter(t)}
-              className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold transition-all ${filter === t ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`flex-1 md:flex-none px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${filter === t ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
             >
               {t}
             </button>

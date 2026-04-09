@@ -32,8 +32,10 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [needsInit, setNeedsInit] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'connecting' | 'unknown'>('unknown');
 
   useEffect(() => {
+    console.log('Dashboard mounted. API_BASE_URL:', API_BASE_URL);
     const checkUser = () => {
       try {
         const storedUser = localStorage.getItem('user');
@@ -46,19 +48,43 @@ export default function Dashboard() {
     };
     checkUser();
     checkInitialization();
+    checkDbStatus();
   }, []);
+
+  const checkDbStatus = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/health`);
+      if (res.ok) {
+        const data = await res.json();
+        setDbStatus(data.database);
+      } else {
+        setDbStatus('disconnected');
+      }
+    } catch (error) {
+      setDbStatus('disconnected');
+    }
+  };
 
   const checkInitialization = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/questions`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
+      
+      if (!res.ok) {
+        if (res.status === 403 || res.status === 401) {
+          // Token might be invalid
+          return;
+        }
+        throw new Error('Failed to fetch questions');
+      }
+
       const data = await res.json();
       if (Array.isArray(data) && data.length === 0) {
         setNeedsInit(true);
       }
     } catch (error) {
-      console.error('Failed to check initialization');
+      console.error('Failed to check initialization', error);
     }
   };
 
@@ -69,6 +95,7 @@ export default function Dashboard() {
       if (res.ok) {
         toast.success('System initialized successfully!');
         setNeedsInit(false);
+        setTimeout(() => window.location.reload(), 1000);
       } else {
         throw new Error('Seeding failed');
       }
@@ -89,11 +116,22 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 pb-20 md:pb-0">
       <div className="space-y-2">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">{today}</p>
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">{today}</p>
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${
+              dbStatus === 'connected' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 
+              dbStatus === 'connecting' ? 'bg-amber-500 animate-pulse' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]'
+            }`} />
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              DB: {dbStatus}
+            </span>
+          </div>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
           Welcome back, {user?.name?.split(' ')[0] || 'Alex'} 👋
         </h1>
-        <p className="text-slate-500 text-lg">Start your skill assessment to get personalized career guidance.</p>
+        <p className="text-slate-500 text-base sm:text-lg">Start your skill assessment to get personalized career guidance.</p>
       </div>
 
       {needsInit && (
@@ -121,18 +159,18 @@ export default function Dashboard() {
 
       {/* Main CTA */}
       <Card className="bg-blue-50 border-none shadow-none rounded-3xl overflow-hidden relative">
-        <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <CardContent className="p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
               <Sparkles className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-xl font-bold text-slate-900">Complete Your Skill Assessment</h3>
-              <p className="text-slate-600 max-w-md">Answer a quick questionnaire to unlock career recommendations and gap analysis.</p>
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Complete Your Skill Assessment</h3>
+              <p className="text-sm sm:text-slate-600 max-w-md">Answer a quick questionnaire to unlock career recommendations and gap analysis.</p>
             </div>
           </div>
-          <Link to="/assessments">
-            <Button className="h-12 px-8 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold gap-2 shadow-lg shadow-blue-200">
+          <Link to="/assessments" className="w-full md:w-auto">
+            <Button className="w-full md:w-auto h-12 px-8 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold gap-2 shadow-lg shadow-blue-200">
               Start Now
               <ArrowRight className="w-4 h-4" />
             </Button>

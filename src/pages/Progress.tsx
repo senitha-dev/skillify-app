@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { Award, Target, Zap, Book, Search, CheckCircle2, Circle, Star } from 'lucide-react';
 import { API_BASE_URL } from '../config';
+import { toast } from 'sonner';
 
 export default function Progress() {
   const [user, setUser] = useState<any>(null);
@@ -39,13 +40,18 @@ export default function Progress() {
         })
       ]);
 
+      if (!statsRes.ok || !historyRes.ok) {
+        throw new Error('Failed to fetch progress data');
+      }
+
       const statsData = await statsRes.json();
       const historyData = await historyRes.json();
 
       setStats(statsData);
-      if (historyData.length > 0) setLatestAssessment(historyData[0]);
-    } catch (error) {
-      console.error('Failed to load stats');
+      if (Array.isArray(historyData) && historyData.length > 0) setLatestAssessment(historyData[0]);
+    } catch (error: any) {
+      console.error('Failed to load stats', error);
+      toast.error(error.message || 'Failed to load progress data');
     } finally {
       setIsLoading(false);
     }
@@ -80,8 +86,8 @@ export default function Progress() {
   return (
     <div className="space-y-8 pb-20 md:pb-0">
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Progress & Analytics</h1>
-        <p className="text-slate-500 text-lg">Track your skill development over time</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Progress & Analytics</h1>
+        <p className="text-slate-500 text-base sm:text-lg">Track your skill development over time</p>
       </div>
 
       {/* Stats Grid */}
@@ -103,16 +109,16 @@ export default function Progress() {
 
       {/* Main Chart */}
       <Card className="border-none shadow-sm rounded-[32px] overflow-hidden">
-        <CardHeader className="p-8 pb-0 flex flex-row items-center justify-between">
+        <CardHeader className="p-6 md:p-8 pb-0 flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-bold text-slate-900">Overall Progress</CardTitle>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Assessment Trend</p>
+            <CardTitle className="text-lg md:text-xl font-bold text-slate-900">Overall Progress</CardTitle>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Assessment Trend</p>
           </div>
           <div className="text-right">
-            <span className="text-3xl font-bold text-blue-600">{stats?.overall || 0}%</span>
+            <span className="text-2xl md:text-3xl font-bold text-blue-600">{stats?.overall || 0}%</span>
           </div>
         </CardHeader>
-        <CardContent className="p-8 pt-4 h-[300px]">
+        <CardContent className="p-4 md:p-8 pt-4 h-[250px] md:h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <defs>
