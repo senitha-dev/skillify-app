@@ -34,8 +34,14 @@ export default function Dashboard() {
   const [isInitializing, setIsInitializing] = useState(false);
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'connecting' | 'unknown'>('unknown');
   const [isUriSet, setIsUriSet] = useState<boolean | null>(null);
+  const [isMobileWithoutApi, setIsMobileWithoutApi] = useState(false);
 
   useEffect(() => {
+    // Check if we are on mobile (not http/https) and API_BASE_URL is empty
+    if (typeof window !== 'undefined' && !window.location.protocol.startsWith('http') && !API_BASE_URL) {
+      setIsMobileWithoutApi(true);
+    }
+    
     console.log('Dashboard mounted. API_BASE_URL:', API_BASE_URL);
     const checkUser = () => {
       try {
@@ -135,6 +141,22 @@ export default function Dashboard() {
         </h1>
         <p className="text-slate-500 text-base sm:text-lg">Start your skill assessment to get personalized career guidance.</p>
       </div>
+
+      {isMobileWithoutApi && (
+        <Card className="bg-orange-50 border-orange-100 shadow-none rounded-3xl overflow-hidden">
+          <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600">
+                <Settings className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-bold text-orange-900">Mobile API URL Required</h4>
+                <p className="text-sm text-orange-700">For the mobile app to work, you must set the VITE_API_URL secret in AI Studio to your project's App URL.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {isUriSet === false && (
         <Card className="bg-red-50 border-red-100 shadow-none rounded-3xl overflow-hidden">
