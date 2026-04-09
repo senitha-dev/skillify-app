@@ -64,19 +64,22 @@ export default function Dashboard() {
 
   const checkDbStatus = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/health`);
+      const healthUrl = `${API_BASE_URL}/api/health`;
+      const res = await fetch(healthUrl);
       if (res.ok) {
         const data = await res.json();
-        setDbStatus(data.database);
+        setDbStatus(data.database || 'unknown');
         setIsUriSet(data.mongodb_uri_set);
         setIsApiUrlSet(data.vite_api_url_set);
         setAvailableKeys(data.available_keys || []);
         setDbError(data.db_error);
       } else {
         setDbStatus('disconnected');
+        setDbError(`API returned status ${res.status}: ${res.statusText}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       setDbStatus('disconnected');
+      setDbError(`Failed to connect to API: ${error.message}`);
     }
   };
 

@@ -113,7 +113,7 @@ app.get('/api/health', async (req, res) => {
     status: 'ok',
     database: states[dbState],
     db_error: lastDbError,
-    mongodb_uri_set: !!process.env.MONGODB_URI,
+    mongodb_uri_set: !!MONGODB_URI,
     vite_api_url_set: !!process.env.VITE_API_URL,
     available_keys: Object.keys(process.env).filter(key => 
       key.includes('MONGODB') || key.includes('API') || key.includes('URL') || key.includes('SECRET')
@@ -122,7 +122,7 @@ app.get('/api/health', async (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  if (dbState !== 1 && process.env.MONGODB_URI) {
+  if (dbState !== 1 && MONGODB_URI) {
     connectDB();
   }
   
