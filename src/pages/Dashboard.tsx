@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [needsInit, setNeedsInit] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
   const [dbStatus, setDbStatus] = useState<'connected' | 'disconnected' | 'connecting' | 'unknown'>('unknown');
+  const [isUriSet, setIsUriSet] = useState<boolean | null>(null);
 
   useEffect(() => {
     console.log('Dashboard mounted. API_BASE_URL:', API_BASE_URL);
@@ -57,6 +58,7 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json();
         setDbStatus(data.database);
+        setIsUriSet(data.mongodb_uri_set);
       } else {
         setDbStatus('disconnected');
       }
@@ -134,7 +136,30 @@ export default function Dashboard() {
         <p className="text-slate-500 text-base sm:text-lg">Start your skill assessment to get personalized career guidance.</p>
       </div>
 
-      {needsInit && (
+      {isUriSet === false && (
+        <Card className="bg-red-50 border-red-100 shadow-none rounded-3xl overflow-hidden">
+          <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center text-red-600">
+                <Settings className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-bold text-red-900">Database Configuration Missing</h4>
+                <p className="text-sm text-red-700">Please add your MongoDB URI to the Secrets panel in AI Studio settings.</p>
+              </div>
+            </div>
+            <Button 
+              variant="outline"
+              className="border-red-200 text-red-600 hover:bg-red-100 font-bold rounded-xl px-6"
+              onClick={() => window.location.reload()}
+            >
+              Retry Connection
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {needsInit && dbStatus === 'connected' && (
         <Card className="bg-amber-50 border-amber-100 shadow-none rounded-3xl overflow-hidden">
           <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">

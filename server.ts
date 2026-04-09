@@ -97,20 +97,23 @@ app.get('/api/health', async (req, res) => {
   const dbState = mongoose.connection.readyState;
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
   
+  const info = {
+    status: 'ok',
+    database: states[dbState],
+    mongodb_uri_set: !!MONGODB_URI,
+    mongodb_uri_length: MONGODB_URI ? MONGODB_URI.length : 0,
+    env: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
+  };
+
   if (dbState !== 1) {
     console.log(`[Health Check] DB State: ${states[dbState]}. URI Set: ${!!MONGODB_URI}`);
     if (MONGODB_URI) {
-      // Attempt to reconnect if disconnected
       connectDB();
     }
   }
   
-  res.json({
-    status: 'ok',
-    database: states[dbState],
-    mongodb_uri_set: !!MONGODB_URI,
-    env: process.env.NODE_ENV || 'development'
-  });
+  res.json(info);
 });
 
 // Debug DB Connection
