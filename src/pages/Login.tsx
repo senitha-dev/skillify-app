@@ -38,6 +38,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
       if (isLogin) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        window.dispatchEvent(new Event('auth-change'));
         toast.success('Welcome back to Skillify!');
         onLogin();
         navigate('/');

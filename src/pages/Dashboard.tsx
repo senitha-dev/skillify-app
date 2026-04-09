@@ -34,8 +34,17 @@ export default function Dashboard() {
   const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) setUser(JSON.parse(storedUser));
+    const checkUser = () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser && storedUser !== 'undefined') {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (e) {
+        console.error('Failed to parse user');
+      }
+    };
+    checkUser();
     checkInitialization();
   }, []);
 

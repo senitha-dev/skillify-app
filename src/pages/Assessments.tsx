@@ -57,6 +57,20 @@ export default function Assessments() {
 
   if (isLoading) return <div className="flex items-center justify-center h-64">Loading...</div>;
 
+  if (questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 space-y-4">
+        <h2 className="text-xl font-bold text-slate-900">No Questions Available</h2>
+        <p className="text-slate-500 text-center max-w-md">
+          The assessment system hasn't been initialized yet. Please go back to the dashboard and initialize the system.
+        </p>
+        <Button onClick={() => navigate('/')} className="bg-blue-600 text-white rounded-xl px-8">
+          Go to Dashboard
+        </Button>
+      </div>
+    );
+  }
+
   const progress = ((currentStep + 1) / questions.length) * 100;
 
   return (

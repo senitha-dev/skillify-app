@@ -22,11 +22,21 @@ export default function Layout() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('auth-change'));
     navigate('/login');
   };
 
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const getUser = () => {
+    try {
+      const stored = localStorage.getItem('user');
+      if (!stored || stored === 'undefined') return { name: 'User' };
+      return JSON.parse(stored);
+    } catch (e) {
+      return { name: 'User' };
+    }
+  };
+
+  const user = getUser();
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
