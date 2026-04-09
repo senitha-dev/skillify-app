@@ -10,6 +10,7 @@ import GapAnalysis from './pages/GapAnalysis';
 import Layout from './components/Layout';
 import { useEffect, useState, useCallback } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import MobileNavigation from './components/MobileNavigation';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !!localStorage.getItem('token'));
@@ -20,9 +21,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Listen for storage changes from other tabs
     window.addEventListener('storage', checkAuth);
-    // Custom event for same-tab changes
     window.addEventListener('auth-change', checkAuth);
     
     return () => {
@@ -34,6 +33,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <MobileNavigation />
         <Routes>
           <Route path="/login" element={!isAuthenticated ? <Login onLogin={checkAuth} /> : <Navigate to="/" />} />
           

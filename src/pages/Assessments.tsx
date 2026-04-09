@@ -100,27 +100,27 @@ export default function Assessments() {
         <Progress value={progress} className="h-2 bg-slate-100" />
       </div>
 
-      <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[32px] overflow-hidden">
-        <CardHeader className="p-8 pb-4">
-          <CardTitle className="text-3xl font-bold text-slate-900">{questions[currentStep]?.category}</CardTitle>
-          <CardDescription className="text-lg text-slate-500">Rate your proficiency level for each skill.</CardDescription>
+      <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[24px] md:rounded-[32px] overflow-hidden">
+        <CardHeader className="p-5 md:p-8 pb-2 md:pb-4">
+          <CardTitle className="text-2xl md:text-3xl font-bold text-slate-900">{questions[currentStep]?.category}</CardTitle>
+          <CardDescription className="text-sm md:text-lg text-slate-500">Rate your proficiency level for each skill.</CardDescription>
         </CardHeader>
-        <CardContent className="p-8 pt-4 space-y-10">
-          <div className="space-y-6">
+        <CardContent className="p-5 md:p-8 pt-2 md:pt-4 space-y-6 md:space-y-10">
+          <div className="space-y-4 md:space-y-6">
             <div className="flex justify-between items-center">
-              <h4 className="font-bold text-slate-900 text-lg">{questions[currentStep]?.text}</h4>
-              <span className="text-blue-600 font-bold text-sm">
+              <h4 className="font-bold text-slate-900 text-base md:text-lg">{questions[currentStep]?.text}</h4>
+              <span className="text-blue-600 font-bold text-xs md:text-sm">
                 {answers[questions[currentStep]?.category] !== undefined ? 
                   ['None', 'Beg.', 'Inter.', 'Adv.', 'Expert'][answers[questions[currentStep]?.category]] : 
                   'None'}
               </span>
             </div>
-            <div className="grid grid-cols-5 gap-2 p-1 bg-slate-50 rounded-2xl border border-slate-100">
+            <div className="grid grid-cols-5 gap-1 md:gap-2 p-1 bg-slate-50 rounded-xl md:rounded-2xl border border-slate-100">
               {['None', 'Beg.', 'Inter.', 'Adv.', 'Expert'].map((label, i) => (
                 <button
                   key={i}
                   onClick={() => handleAnswer(questions[currentStep]?.category, i)}
-                  className={`py-3 rounded-xl text-xs font-bold transition-all ${
+                  className={`py-2.5 md:py-3 rounded-lg md:rounded-xl text-[10px] md:text-xs font-bold transition-all ${
                     answers[questions[currentStep]?.category] === i 
                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
                     : 'text-slate-500 hover:bg-white hover:text-slate-900'
@@ -132,10 +132,10 @@ export default function Assessments() {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 md:gap-4">
             <Button 
               variant="outline" 
-              className="flex-1 h-14 rounded-2xl border-slate-100 text-slate-600 font-bold gap-2"
+              className="flex-1 h-12 md:h-14 rounded-xl md:rounded-2xl border-slate-100 text-slate-600 font-bold gap-2"
               disabled={currentStep === 0}
               onClick={() => setCurrentStep(prev => prev - 1)}
             >
@@ -144,15 +144,15 @@ export default function Assessments() {
             </Button>
             {currentStep === questions.length - 1 ? (
               <Button 
-                className="flex-1 h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-200"
+                className="flex-1 h-12 md:h-14 rounded-xl md:rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-200"
                 onClick={handleSubmit}
               >
-                Submit Assessment
+                Submit
                 <CheckCircle2 className="w-4 h-4" />
               </Button>
             ) : (
               <Button 
-                className="flex-1 h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-200"
+                className="flex-1 h-12 md:h-14 rounded-xl md:rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-200"
                 onClick={() => setCurrentStep(prev => prev + 1)}
               >
                 Next

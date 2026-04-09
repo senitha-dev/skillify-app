@@ -146,18 +146,18 @@ export default function Dashboard() {
           <Sparkles className="w-3 h-3" />
           QUICK ACTIONS
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {quickActions.map((action, i) => (
             <Link key={i} to={action.path}>
-              <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group rounded-2xl">
-                <CardContent className="p-6 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 ${action.bg} ${action.color} rounded-xl flex items-center justify-center`}>
-                      <action.icon className="w-6 h-6" />
+              <Card className="border-none shadow-sm hover:shadow-md transition-all cursor-pointer group rounded-2xl active:scale-[0.98]">
+                <CardContent className="p-4 md:p-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className={`w-10 h-10 md:w-12 md:h-12 ${action.bg} ${action.color} rounded-xl flex items-center justify-center`}>
+                      <action.icon className="w-5 h-5 md:w-6 md:h-6" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900">{action.label}</h4>
-                      <p className="text-xs text-slate-500">{action.desc}</p>
+                      <h4 className="font-bold text-slate-900 text-sm md:text-base">{action.label}</h4>
+                      <p className="text-[10px] md:text-xs text-slate-500">{action.desc}</p>
                     </div>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-slate-900 transition-colors" />

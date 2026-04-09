@@ -23,7 +23,7 @@ export default function Layout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.dispatchEvent(new Event('auth-change'));
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const getUser = () => {
@@ -39,9 +39,9 @@ export default function Layout() {
   const user = getUser();
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 safe-top">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -87,34 +87,35 @@ export default function Layout() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 pb-24 md:pb-6">
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="w-full"
         >
           <Outlet />
         </motion.div>
       </main>
 
       {/* Mobile Nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-4 py-2 flex justify-around items-center z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-200 px-4 pt-2 pb-safe flex justify-around items-center z-50">
         {navItems.slice(0, 4).map((item) => (
-          <Link key={item.path} to={item.path} className="flex flex-col items-center gap-1">
-            <div className={`p-2 rounded-xl ${location.pathname === item.path ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}`}>
-              <item.icon className="w-6 h-6" />
+          <Link key={item.path} to={item.path} className="flex flex-col items-center gap-1 flex-1 py-1">
+            <div className={`p-2 rounded-2xl transition-all ${location.pathname === item.path ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 scale-110' : 'text-slate-400'}`}>
+              <item.icon className="w-5 h-5" />
             </div>
-            <span className={`text-[10px] font-medium ${location.pathname === item.path ? 'text-blue-600' : 'text-slate-400'}`}>
+            <span className={`text-[9px] font-bold uppercase tracking-tighter ${location.pathname === item.path ? 'text-blue-600' : 'text-slate-400'}`}>
               {item.label}
             </span>
           </Link>
         ))}
-        <Link to="/progress" className="flex flex-col items-center gap-1">
-          <div className={`p-2 rounded-xl ${location.pathname === '/progress' ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}`}>
-            <User className="w-6 h-6" />
+        <Link to="/progress" className="flex flex-col items-center gap-1 flex-1 py-1">
+          <div className={`p-2 rounded-2xl transition-all ${location.pathname === '/progress' ? 'bg-blue-600 text-white shadow-lg shadow-blue-100 scale-110' : 'text-slate-400'}`}>
+            <User className="w-5 h-5" />
           </div>
-          <span className={`text-[10px] font-medium ${location.pathname === '/progress' ? 'text-blue-600' : 'text-slate-400'}`}>
+          <span className={`text-[9px] font-bold uppercase tracking-tighter ${location.pathname === '/progress' ? 'text-blue-600' : 'text-slate-400'}`}>
             Profile
           </span>
         </Link>
