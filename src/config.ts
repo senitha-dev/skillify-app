@@ -1,4 +1,4 @@
-const rawApiUrl = (import.meta as any).env.VITE_API_URL || '';
+const rawApiUrl = (import.meta as any).env.VITE_API_URL || 'https://skillify-app-production.up.railway.app';
 
 // Robust check for API URL
 export const API_BASE_URL = (() => {
