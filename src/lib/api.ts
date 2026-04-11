@@ -31,8 +31,9 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     }
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[API] Fetch error:', error);
-    throw error;
+    const fullUrl = `${API_BASE_URL}${endpoint}`;
+    throw new Error(`Failed to fetch from ${fullUrl}: ${error.message}`);
   }
 }

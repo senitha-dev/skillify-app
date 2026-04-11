@@ -79,7 +79,10 @@ export default function Dashboard() {
       }
     } catch (error: any) {
       setDbStatus('disconnected');
-      setDbError(`Failed to connect to API: ${error.message}`);
+      const message = error.message === 'Failed to fetch' 
+        ? 'Failed to fetch (likely a CORS error or server is down). Make sure your Railway backend allows requests from this origin.'
+        : error.message;
+      setDbError(`Failed to connect to API at ${API_BASE_URL}: ${message}`);
     }
   };
 
