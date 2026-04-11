@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
     of: Number, // 0: None, 1: Beg, 2: Inter, 3: Adv, 4: Expert
     default: {}
   },
+  gpa: { type: String },
+  certifications: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

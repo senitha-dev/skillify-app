@@ -32,7 +32,7 @@ export default function Progress() {
   const fetchData = async () => {
     try {
       const [statsRes, historyRes] = await Promise.all([
-        apiFetch('/api/stats'),
+        apiFetch('/api/users/stats'),
         apiFetch('/api/assessments/history')
       ]);
 

@@ -121,7 +121,10 @@ export default function Resources() {
                 </div>
               </div>
 
-              <Button className="w-full h-11 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold gap-2">
+              <Button 
+                className="w-full h-11 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold gap-2"
+                onClick={() => window.open(resource.url, '_blank')}
+              >
                 View Course
                 <ExternalLink className="w-4 h-4" />
               </Button>

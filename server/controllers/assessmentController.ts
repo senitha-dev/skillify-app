@@ -4,12 +4,14 @@ import { AssessmentResult } from '../models/AssessmentResult';
 
 export const submitAssessment = async (req: any, res: Response) => {
   try {
-    const { scores } = req.body;
+    const { scores, gpa, certifications } = req.body;
     const userId = req.user.id;
 
     const user = await User.findById(userId);
     if (user) {
       user.skills = new Map(Object.entries(scores));
+      if (gpa !== undefined) user.gpa = gpa;
+      if (certifications !== undefined) user.certifications = certifications;
       await user.save();
     }
 

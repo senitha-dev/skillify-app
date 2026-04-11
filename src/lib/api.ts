@@ -17,7 +17,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     });
 
     if (response.status === 403 || response.status === 401) {
-      console.error('[API] Session expired or invalid (403/401)');
+      console.error(`[API] Session expired or invalid (Status: ${response.status}) at ${endpoint}`);
       // Clear auth and redirect
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -28,6 +28,12 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
         toast.error('Session expired. Please login again.');
       }
       return null;
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error(`[API] Request failed: ${response.status} ${response.statusText}`, errorData);
+      return response; // Return the response so the caller can handle the error
     }
 
     return response;
